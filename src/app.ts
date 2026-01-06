@@ -10,7 +10,6 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended : true}));
 app.use(cookieParser());
-app.use(arcjetMiddleware);
 
 app.get("/"  , (req : Request, res : Response)=>{
   res.send("Hi, Jexts here!")
@@ -21,5 +20,6 @@ app.use("/api/v1/users" ,userRouter );
 app.use("/api/v1/subcriptions" , subcriptionRouter);
 
 app.use(errorMiddleware);
+// app.use(arcjetMiddleware);
 
 export default app;

@@ -10,7 +10,7 @@ export interface SubcriptionInterface extends Document{
   paymentMethod : string , 
   status : SubscriptionStatus , 
   startDate : Date , 
-  renewalDate : Date , 
+  renewalDate ?: Date , 
   user : mongoose.Schema.Types.ObjectId
 }
 
@@ -35,6 +35,7 @@ const subcriptionSchema = new mongoose.Schema<SubcriptionInterface>({
   frequency: {
     type : String ,
     enum : ['daily' , 'weekly' , 'monthly' , 'yearly'] , 
+    required : true 
   }, 
   category:{
     type : String , 
@@ -65,6 +66,7 @@ const subcriptionSchema = new mongoose.Schema<SubcriptionInterface>({
     type : Date , 
     validate :  {
       validator : function( this : any ,  value : Date){
+        if(!value) return true;
         return value > this.startDate;
       } , 
       message : "Renewal date must be after the start date",
@@ -88,8 +90,14 @@ subcriptionSchema.pre("save" , function(this : SubcriptionInterface, next : any)
       yearly : 365
     };
 
+    const days = renewalPeriods[this.frequency!];
+
+    if (!days) {
+        throw new Error("Invalid subscription frequency");
+    }
+
     this.renewalDate = new Date(this.startDate);
-    this.renewalDate.setDate(this.renewalDate.getDate() + renewalPeriods[this.frequency!]);
+    this.renewalDate.setDate(this.renewalDate.getDate() + days);
 
   }
   // Auto-update the status if renewal  date has passed 
@@ -97,8 +105,6 @@ subcriptionSchema.pre("save" , function(this : SubcriptionInterface, next : any)
   if(this.renewalDate < new Date()){
     this.status  = 'expired';
   }
-
-  next();
 
 })
 

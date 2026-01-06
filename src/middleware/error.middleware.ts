@@ -38,6 +38,9 @@ export const errorMiddleware = async( err : any , req :Request , res : Response 
     }) 
 
   }catch(error){
-    next(error);
+    return res.status(500).json({
+      success : false , 
+      error : "Server Error"
+    })
   }
 }

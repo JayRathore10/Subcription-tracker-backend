@@ -4,7 +4,6 @@ import { UserRequest } from "../types/userRequest.types";
 
 export const createSubcription = async(req : UserRequest , res : Response, next : NextFunction)=>{
   try{
-
     if(!req.user){
       const error:any = new Error("User data is missing");
       error.statusCode = 404;
@@ -21,7 +20,7 @@ export const createSubcription = async(req : UserRequest , res : Response, next 
       data : subcription
     });
 
-  }catch(error){
+  }catch(error : any){
     next(error);
   }
 }

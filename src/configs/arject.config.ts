@@ -1,10 +1,6 @@
 import arcjet, { shield, detectBot, tokenBucket } from "@arcjet/node";
 import { ARCJECT_KEY } from "./env.config";
 
-if (!ARCJECT_KEY) {
-  throw new Error("ARCJET_KEY is missing");
-}
-
 const aj = arcjet({
   key: ARCJECT_KEY as string,
   rules: [
