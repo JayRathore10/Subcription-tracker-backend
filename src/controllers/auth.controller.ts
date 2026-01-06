@@ -69,18 +69,52 @@ export const signUp = async(req : Request ,res : Response , next : NextFunction)
   }
 }
 
-export const signIn = async(req : Request , res : Response)=>{
+export const signIn = async(req : Request , res : Response , next :NextFunction)=>{
   try{
+    const {email , password} = req.body;
+
+    if(!email || !password){
+      const error : any = new Error("Enter all information");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    const user = await User.findOne({email});
+
+    if(!user){
+      const error : any = new Error("User not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const isPasswordValid = await bcrypt.compare(password , user.password); 
+
+    if(!isPasswordValid){
+      const error : any = new Error("Invalid Password");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    const token = jwt.sign({userId : user._id} , JWT_SECRET as string , {expiresIn : JWT_EXPIRES_IN as StringValue} );
+
+    return res.status(200).json({
+      success : true , 
+      message : "User signed in successfully" ,
+      data:{
+        token , 
+        user
+      }
+    });
 
   }catch(error){
-
+    next(error);
   }
 }
 
-export const signOut = async(req : Request , res : Response)=>{
+export const signOut = async(req : Request , res : Response , next: NextFunction)=>{
   try{
-
-  }catch(error){
     
+  }catch(error){
+    next(error) ;  
   }
 }
