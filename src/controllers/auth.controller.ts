@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { User } from '../models/user.model';
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { JWT_EXPIRES_IN, JWT_SECRET } from '../configs/env.config';
+import { JWT_EXPIRES_IN, JWT_SECRET , NODE_ENV} from '../configs/env.config';
 import { UserPlayLoad } from '../types/userPlayLoad.types';
 import { StringValue } from "ms";
 
@@ -53,7 +53,9 @@ export const signUp = async(req : Request ,res : Response , next : NextFunction)
     await session.commitTransaction();
     session.endSession();
 
-    res.status(201).json({
+    res.cookie("token" , token);
+
+    return res.status(201).json({
       success : true ,
       message : "User created Successfully" , 
       data : {
@@ -97,6 +99,8 @@ export const signIn = async(req : Request , res : Response , next :NextFunction)
 
     const token = jwt.sign({userId : user._id} , JWT_SECRET as string , {expiresIn : JWT_EXPIRES_IN as StringValue} );
 
+    res.cookie("token" , token);
+
     return res.status(200).json({
       success : true , 
       message : "User signed in successfully" ,
@@ -113,7 +117,14 @@ export const signIn = async(req : Request , res : Response , next :NextFunction)
 
 export const signOut = async(req : Request , res : Response , next: NextFunction)=>{
   try{
-    
+    return res.clearCookie("token" , {
+      httpOnly : true ,   
+      secure : NODE_ENV === "production" , 
+      sameSite :"strict"
+    }).status(200).json({
+      success : true   ,
+      message :  "Logged out Successfully"
+    })
   }catch(error){
     next(error) ;  
   }
