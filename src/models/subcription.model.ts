@@ -1,7 +1,7 @@
-import mongoose , {Document} from "mongoose";
+import mongoose , {Document, HydratedDocument} from "mongoose";
 import { Frequency , Currency , SubscriptionStatus, Category } from "../types/subcription.types";
 
-export interface SubcriptionInterface extends Document{
+export interface SubcriptionInterface {
   name : string , 
   price : number , 
   currency : Currency ,
@@ -13,6 +13,8 @@ export interface SubcriptionInterface extends Document{
   renewalDate ?: Date , 
   user : mongoose.Schema.Types.ObjectId
 }
+
+export type SubcriptionDocument = HydratedDocument<SubcriptionInterface>;
 
 const subcriptionSchema = new mongoose.Schema<SubcriptionInterface>({
   name : {
